@@ -1,0 +1,6 @@
+src\__pycache__
+venv
+src/__pycache__/get_data.cpython-39.pyc
+src/__pycache__/visualization.cpython-39.pyc
+__init__.py
+src\data
