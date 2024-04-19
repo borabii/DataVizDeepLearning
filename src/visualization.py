@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go   
-
+import folium
 df_conso_brute = read_conso_csv_file()
 # 
 df_addresse_france_brute = read_adresse_csv_file()
@@ -22,44 +22,59 @@ def df_addresse_france_viz():
 
 def viz_données_finale():
     st.subheader('Données brutes')
-    st.write(df_final.head(10))
+    st.dataframe(df_final.head(10))
 
 
-def visualization():
+def visualization_conso_par_filiere_operateur():
     st.subheader("Visualisation interactives")
 
-    # Sélectionnez deux colonnes à afficher
-    column1 = st.selectbox("Sélectionner la première colonne", df_final.columns)
-    column2 = st.selectbox("Sélectionner la deuxième colonne", df_final.columns)
+    # Filtrer les colonnes numériques pour l'axe x
+    colonnes_axe_x = ["Filière", "Opérateur"]
+    axe_x = st.selectbox("Sélectionner une colonne pour l'axe x ", colonnes_axe_x)
 
-    # Visualisation en nuage de points
-    fig = px.scatter(df_final, x=column1, y=column2)
-    st.plotly_chart(fig)
+    # Filtrer les colonnes non numériques pour l'axe y
+    colonnes_axe_y = ["Consommation Agriculture (MWh)",
+                      "Consommation Industrie (MWh)",
+                      "Consommation Tertiaire  (MWh)",
+                      "Consommation Résidentiel  (MWh)",
+                      "Consommation Secteur Inconnu (MWh)",
+                      "Consommation totale (MWh)"]
+    axe_y = st.selectbox("Sélectionner une colonne pour l'axe y", colonnes_axe_y)
+    data_for_chart = df_final[[axe_x, axe_y]].copy()
+
+    # Conversion des données en valeurs numériques
+    data_for_chart[axe_y] = pd.to_numeric(data_for_chart[axe_y], errors='coerce')
+
+    # Supprimer les lignes avec des valeurs nulles
+    data_for_chart = data_for_chart.dropna(subset=[axe_y])
+
+    # Affichage du graphique à barres avec les données converties
+    st.bar_chart(data_for_chart.set_index(axe_x))
 
 def geoloc_viz():
     st.subheader('Carte des stations')
-    
-    fig = go.Figure(go.Scattermapbox(
-        lat=df_final["latitude"], 
-        lon=df_final["longitude"], 
-        mode='markers',
-        marker=dict(
-            size=10,
-            color='red', 
-            opacity=0.8
-        ),
-        text="code_postal"+ df_final["code_postal"] + ": Consommation totale (MWh) " + df_final["Consommation totale (MWh)"].astype(str),  # Text to display on hover
-        hoverinfo='text' 
-    ))
-    
-    st.title("Répartition des zones de réseaux")
-    fig.update_layout(
-        mapbox_style="open-street-map", 
-        autosize=True,
-        margin=dict(l=0, r=0, t=0, b=0),
-        mapbox=dict(center=go.layout.mapbox.Center(lat=48.8566, lon=2.3522), zoom=5)
-    )
-    
+    df_cleaned = df_final.dropna(subset=['latitude', 'longitude'])
+    # Créer une carte Folium
+    m = folium.Map(location=[48.8566, 2.3522], zoom_start=5)
+
+    # Ajouter des marqueurs pour chaque station
+    for index, row in df_cleaned.iterrows():
+        popup_text = f"Code postal: {row['code_postal']}, Consommation totale (MWh): {row['Consommation totale (MWh)']}"
+        folium.Marker([row['latitude'], row['longitude']], popup=popup_text).add_to(m)
+
+    # Afficher la carte dans Streamlit
+     # Convertir la carte en HTML
+    m_html = m.get_root().render()
+
+    # Afficher la carte dans Streamlit
+    st.components.v1.html(m_html, width=800, height=600)
+
+    # Afficher la carte dans Streamlit en utilisant st.write pour afficher le HTML généré par Folium
+
+
+def visualization_conso_total_par_année():
+    st.subheader("Visualisation de la consomation total par année")
+    fig = px.bar(df_final, x=df_final["Année"], y=df_final["Consommation totale (MWh)"])
     st.plotly_chart(fig)
 
     
