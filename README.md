@@ -1,4 +1,5 @@
 # DataVizDeepLearning
 
-\*Pour lancer le projet faut éxecuter le script sh
-.\run_app.sh
+## Lancer le script run_app.sh pour exécuter l'application sur Streamlit
+
+### .\run_app.sh
