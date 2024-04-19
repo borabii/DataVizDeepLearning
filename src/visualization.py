@@ -5,10 +5,11 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go   
 import folium
+
+
 df_conso_brute = read_conso_csv_file()
 # 
 df_addresse_france_brute = read_adresse_csv_file()
-
 
 df_final = pretraitement(df_conso_brute,df_addresse_france_brute)
 
@@ -23,7 +24,6 @@ def df_addresse_france_viz():
 def viz_données_finale():
     st.subheader('Données brutes')
     st.dataframe(df_final.head(10))
-
 
 def visualization_conso_par_filiere_operateur():
     st.subheader("Visualisation interactives")
@@ -52,25 +52,18 @@ def visualization_conso_par_filiere_operateur():
     st.bar_chart(data_for_chart.set_index(axe_x))
 
 def geoloc_viz():
-    st.subheader('Carte des stations')
+    st.subheader('Visualisation des consomations totals par commune')
     df_cleaned = df_final.dropna(subset=['latitude', 'longitude'])
-    # Créer une carte Folium
     m = folium.Map(location=[48.8566, 2.3522], zoom_start=5)
-
     # Ajouter des marqueurs pour chaque station
     for index, row in df_cleaned.iterrows():
         popup_text = f"Code postal: {row['code_postal']}, Consommation totale (MWh): {row['Consommation totale (MWh)']}"
         folium.Marker([row['latitude'], row['longitude']], popup=popup_text).add_to(m)
-
-    # Afficher la carte dans Streamlit
-     # Convertir la carte en HTML
+    # Convertir la carte en HTML
     m_html = m.get_root().render()
-
     # Afficher la carte dans Streamlit
     st.components.v1.html(m_html, width=800, height=600)
-
     # Afficher la carte dans Streamlit en utilisant st.write pour afficher le HTML généré par Folium
-
 
 def visualization_conso_total_par_année():
     st.subheader("Visualisation de la consomation total par année")
