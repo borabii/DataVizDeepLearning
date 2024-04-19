@@ -14,15 +14,15 @@ df_final = pretraitement(df_conso_brute,df_addresse_france_brute)
 
 def df_conso_brute_viz():
     st.subheader('CSV Consomation électricité et gas')
-    st.write(df_conso_brute)
+    st.write(df_conso_brute.head(10))
 
 def df_addresse_france_viz():
     st.subheader('CSV Communes De France')
-    st.write(df_conso_brute)
+    st.write(df_addresse_france_brute.head(10))
 
 def viz_données_finale():
     st.subheader('Données brutes')
-    st.write(df_final)
+    st.write(df_final.head(10))
 
 
 def visualization():

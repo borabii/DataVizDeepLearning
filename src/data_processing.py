@@ -4,20 +4,21 @@ import pandas as pd
 
 def pretraitement(df_conso,df_adresse):
     #supprimer les colonnes 
-    columns_to_keep = ['code_postal','latitude','longitude',]
+    columns_to_keep = ['code_postal','latitude','longitude']
     df_adresse = df_adresse[columns_to_keep].copy()
     #supprimer les colonnes nulls dans longitude et latitude
     df_adresse.dropna(subset=['latitude', 'longitude'], inplace=True)
-    #rajouter la colonne  dans df_conso 
-  
+    
+    #Renomer la colonne Code_postal
     df_conso = df_conso.rename(columns={'Code_postal': 'code_postal'})
+    #Changer les types des deux colonnes
     df_conso['code_postal'] = df_conso['code_postal'].astype(str)
     df_adresse['code_postal'] = df_adresse['code_postal'].astype(str)
-    # Merge df_conso with df_adresse on the code postal column
+    # Merger df_conso avec df_adresse sur la colonne code postal
     df_final = pd.merge(df_conso, df_adresse, on='code_postal', how='left')
-    df_unique = df_final.drop_duplicates(subset=['code_postal'])       
-
-    
-    
-    return df_unique
-    
+    #filter les données par années
+    années_a_filtrer = [2019,2020,2021]
+    df_final_filtrer = df_final[df_final['Année'].isin(années_a_filtrer)]
+    #Supprimer les lignes dupliquer 
+    df_final_unique = df_final_filtrer.drop_duplicates(subset=['code_postal'])      
+    return df_final_unique

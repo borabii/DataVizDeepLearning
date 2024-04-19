@@ -10,13 +10,15 @@ def main():
 
     # Sélecteur de section
     section = st.sidebar.selectbox("Sélectionnez une section :", [
-                                   "Visualisation", "Prétraitement", "Visualisation après Prétraitement"])
+                                   "Visualisation des données brut", "predections", "Visualisation après Prétraitement"])
 
     # Afficher la section sélectionnée
-    if section == "Visualisation":
-        visualisation()
-    elif section == "Visualisation des predections":
+    if section == "Visualisation des données brut":
+        visualisation_données_brute()
+    elif section == "predections":
         visualisation_predections()
+    elif section == "Visualisation après Prétraitement":
+        visualisation()
 
 
 
@@ -24,11 +26,10 @@ def visualisation_données_brute():
     st.header("Section de Visualisation des données brutes")
     df_conso_brute_viz()
     df_addresse_france_viz()
-    df_conso_brute_viz()
 
 
 def visualisation():
-    st.header("Section de Visualisation")
+    st.header("Section de Visualisation des données pré-traiter")
     viz_données_finale()
     geoloc_viz()
     visualization()
