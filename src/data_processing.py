@@ -1,5 +1,10 @@
 import pandas as pd
+from get_data import read_conso_csv_file, read_adresse_csv_file
 
+
+df_conso_brute = read_conso_csv_file()
+# 
+df_addresse_france_brute = read_adresse_csv_file()
 
 
 def pretraitement(df_conso,df_adresse):
@@ -22,5 +27,13 @@ def pretraitement(df_conso,df_adresse):
     df_final_filtrer = df_final[df_final['Année'].isin(années_a_filtrer)]
     #Supprimer les lignes dupliquer 
     df_final_unique = df_final_filtrer.drop_duplicates(subset=['code_postal'])
+    df_subset = df_final_unique.drop(columns=["Code Commune","code_postal","Code EPCI","Opérateur","Code Département","Filière","Libellé EPCI","Libellé Commune","Libellé Département","Libellé Région"])
+   
+   
+    df_subset['Année'] = df_subset['Année'].astype(int)
+    df_subset.dropna(subset=['latitude'], inplace=True)
+    df_subset.dropna(subset=['longitude'], inplace=True)
+    return df_subset
 
-    return df_final_unique
+df_final = pretraitement(df_conso_brute,df_addresse_france_brute)
+
